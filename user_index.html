@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+    <script type="text/javascript">
+     function add() {
+         let id = document.getElementById("id").value;
+         let qty = document.getElementById("qty").value;
+         fetch("/user/cart?username=ijc&id=" + id + "&qty=" + qty, {
+             method: "PUT",
+         })
+         .then(response => response.json())
+         .then(data => console.log(data));
+    }
+    </script>
+    <body>
+        Noice.<br />
+        ID: <input type="number" id="id" /><br />
+        QTY: <input type="number" id="qty" />
+        <button onclick="add()">add your boy</button>
+    </body>
+</html>
