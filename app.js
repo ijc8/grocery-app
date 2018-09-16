@@ -56,6 +56,11 @@ var users = {
 app.get('/', (req, res) => res.send('sad'));
 
 app.get('/user', (req, res) => res.sendFile('./user_index.html', { root: __dirname }));
+app.get('/admin',(req, res) => res.sendFile('./admin_index.html', { root: __dirname}));
+
+app.get('/users', (req, res) => {
+    res.send(JSON.stringify(users));
+})
 
 app.get('/user/cart', (req, res) => {
     let cart = users[req.query.username].cart;
@@ -186,9 +191,6 @@ app.post('/admin/finalize', (req, res) => {
             Object.keys(cart).forEach((item) => {
                 peapod.addToCart(item, cart[item], (err, succeed) => {
                     i += 1;
-                    console.log(item);
-                    console.log(err);
-                    console.log(succeed);
                     s += "Added " + item + " (" + cart[item] + ")\n";
                     if (i === Object.keys(cart).length) {
                         res.send(s);

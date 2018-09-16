@@ -1,4 +1,85 @@
 <!doctype html>
 <html>
-    Noice.
+    <script type="text/javascript">
+        function confirm(user) {
+            console.log(user);
+            fetch(`/admin/confirm?username=${user}`, {
+                method: "POST"
+            }).then(response => response.json())
+            .then(data => updatePaid(user, data));
+        }
+
+        function showCarts() {
+            fetch("/users", {
+                    method: "GET"
+                }).then(response => response.json())
+                .then(data => updateCarts(data));
+        }
+
+        function updatePaid(user, paid){
+            document.getElementById(`${user}_submitted`).innerHTML = `Submitted: {}`;
+            document.getElementById(`${user}_paid`).innerHTML = `Paid: ${JSON.stringify(paid)}`;
+        }
+
+        function updateCarts(data) {
+            var carts = "";
+            Object.keys(data).forEach(user => {
+                carts +=`<div id="${user}">` +
+                        `User: ${user} <br />` +
+                        `<div id="${user}_unsubmitted">` +
+                            `Unsubmitted: ${JSON.stringify(data[user].cart.unsubmitted)}` +
+                        `</div>` +
+                        `<div id="${user}_submitted">` +
+                            `Submitted: ${JSON.stringify(data[user].cart.submitted)}` +
+                        `</div>` +
+                        `<div id="${user}_paid">` +
+                            `Paid: ${JSON.stringify(data[user].cart.paid)}` +
+                        `</div>` +
+                        `</div>` +
+                        `<button onclick="confirm('${user}')">confirm paid </button><br />`;
+            });
+            document.getElementById("users").innerHTML = carts;
+        }
+
+        function finalize() {
+            fetch("/admin/finalize", {
+             method: "POST",
+            }).then(response => {
+                showCarts();
+            });
+        }
+
+        function deleteNotification() {
+            let id = document.getElementById("delete").value;
+            fetch("/admin/notifications?id=" + id, {
+                method: "DELETE",
+            }).then(response => response.json())
+            .then(data => {
+                document.getElementById("notifications").innerHTML = data;
+            });
+        }
+
+        window.onload = () => {
+            fetch("/admin/notifications", {
+                method: "GET",
+            }).then(response => response.json())
+            .then(data => {
+                document.getElementById("notifications").innerHTML = data;
+            });
+
+            showCarts();
+        }
+    </script>
+    <body>
+
+        User carts: <br />
+        <div id="users"></div>
+
+        <button onclick="finalize()">finalize</button><br />
+
+        Notifications:<br />
+        <div id="notifications"></div>
+
+        <input type="number" id="delete" /><button onclick="deleteNotification()">delete</button><br />
+    </body>
 </html>

@@ -7,7 +7,10 @@
          fetch("/user/cart?username=ijc&id=" + id + "&qty=" + qty, {
              method: "PUT",
          })
-         .then(response => response.json())
+         .then(response => {
+            console.log(response);
+            response.json();
+         })
          .then(data => console.log(data));
     }
     </script>
