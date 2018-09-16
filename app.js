@@ -75,11 +75,21 @@ app.put('/user/cart', (req, res) => {
     res.send(JSON.stringify(cart));
 });
 
-app.delete('/user/cart', (req, res) => {
-    // TODO handle submitted/paid stuff
-    let cart = users[req.query.username].cart.unsubmitted;
+app.delete('/user/cart/:type', (req, res) => {
+    let type = req.params.type;
+    if (["unsubmitted", "submitted", "paid"].indexOf(type) === -1) {
+        res.status(400).send("nonexistent cart");
+        return;
+    }
+    let cart = users[req.query.username].cart[type];
     let id = parseInt(req.query.id);
+    if (type === "paid") {
+        users[req.query.username].balance += cart[id].price * cart[id].qty;
+    }
     delete cart[id];
+    if (type == "submitted") {
+        notifications.push(`pls only hound ${req.query.username} for ${calculateTotal(cart)} thx`);
+    }
     res.send(JSON.stringify(cart));
 });
 
