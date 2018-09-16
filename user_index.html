@@ -1,23 +1,127 @@
 <!doctype html>
 <html>
+    <style>
+     table, tr, td {
+         border: 1px solid black;
+     }
+    </style>
     <script type="text/javascript">
+     function get_balance() {
+         fetch("/user/balance?username=ijc")
+         .then(response => response.json())
+         .then(data => document.getElementById("balance").innerHTML = data);
+     }
+
+     function get_cart() {
+         fetch("/user/cart?username=ijc")
+         .then(response => response.json())
+         .then(data => document.getElementById("cart").innerHTML = JSON.stringify(data));
+     }
+
+     function createTableBody(products) {
+         var tbody = document.createElement("tbody");
+         products.forEach(product => {
+             var tr = document.createElement("tr");
+             var id = document.createElement("td");
+             var name = document.createElement("td");
+             var price = document.createElement("td");
+             id.innerHTML = product.prodId;
+             name.innerHTML = product.name;
+             price.innerHTML = product.price;
+             tr.appendChild(id);
+             tr.appendChild(name);
+             tr.appendChild(price);
+             tbody.appendChild(tr);
+         });
+         return tbody;
+     };
+
+     function search() {
+         let query = document.getElementById("query").value;
+         fetch(`/search/${query}`)
+         .then(response => response.json())
+         .then(data => {
+             console.log("Hello?");
+             var tbody = document.getElementById("search-results");
+             console.log(data);
+             console.log(tbody);
+             tbody.parentElement.replaceChild(createTableBody(data.products), tbody);
+         });
+     }
+
      function add() {
-         let id = document.getElementById("id").value;
-         let qty = document.getElementById("qty").value;
-         fetch("/user/cart?username=ijc&id=" + id + "&qty=" + qty, {
+         let id = document.getElementById("add-id").value;
+         let name = document.getElementById("add-name").value;
+         let price = document.getElementById("add-price").value;
+         let qty = document.getElementById("add-qty").value;
+         fetch(`/user/cart?username=ijc&id=${id}&name=${name}&price=${price}&qty=${qty}`, {
              method: "PUT",
          })
-         .then(response => {
-            console.log(response);
-            response.json();
+             .then(response => {
+                 console.log(response);
+                 response.json();
+             })
+             .then(data => console.log(data));
+     }
+
+     function remove() {
+         let id = document.getElementById("remove-id").value;
+         let type = document.getElementById("remove-type").value;
+         fetch(`/user/cart/${type}?username=ijc&id=${id}`, {
+             method: "DELETE",
          })
-         .then(data => console.log(data));
-    }
+             .then(response => {
+                 console.log(response);
+                 response.json();
+             })
+             .then(data => console.log(data));
+     }
+
+     function submit() {
+         fetch(`/user/submit?username=ijc`, {
+             method: "POST",
+         })
+             .then(response => {
+                 console.log(response);
+                 response.json();
+             })
+             .then(data => console.log(data));
+     }
+
+     function demand() {
+         fetch(`/user/demand?username=ijc`, {
+             method: "POST",
+         })
+             .then(response => {
+                 console.log(response);
+                 response.json();
+             })
+             .then(data => console.log(data));
+     }
     </script>
     <body>
-        Noice.<br />
-        ID: <input type="number" id="id" /><br />
-        QTY: <input type="number" id="qty" />
-        <button onclick="add()">add your boy</button>
+        Balance: <span id="balance" >???</span><br/>
+        <button onclick="get_balance()" >update your $$$</button><br/>
+        Cart: <p id="cart" >???</p>
+        <button onclick="get_cart()" >update the cart</button><br/>
+        <input type="text" id="query" />
+        <button onclick="search()" >search it up</button><br/>
+        Search results:
+        <table>
+            <thead>
+                <tr><td>ID</td><td>Name</td><td>Price</td></tr>
+            </thead>
+            <tbody id="search-results" ></tbody>
+        </table>
+        ID: <input type="number" id="add-id" /><br />
+        Name: <input type="text" id="add-name" /><br />
+        Price: <input type="text" id="add-price" /><br />
+        QTY: <input type="number" id="add-qty" /><br/>
+        <button onclick="add()">add your boy</button><br/>
+        ID: <input type="number" id="remove-id" /><br />
+        Subcart: <input type="text" id="remove-type" /><br />
+        <button onclick="remove()">get deleted</button><br/>
+        <button onclick="submit()">submit the cart</button><br/>
+        <button onclick="demand()">gimme the dough</button>
     </body>
 </html>
